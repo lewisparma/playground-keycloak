@@ -1,0 +1,26 @@
+helmDefaults:
+  wait: true
+  args:
+  - "-v=7"
+
+repositories:
+- name: incubator
+  url: "https://kubernetes-charts-incubator.storage.googleapis.com/"
+
+releases:
+- name: config
+  namespace: default
+  chart: incubator/raw
+  values:
+  - resources:
+    - apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: auth
+        labels:
+          deployment.kcos.keysight.com/namespace: auth
+- name: operator
+  namespace: auth
+  chart: ./charts/keycloak-operator
+  needs:
+  - default/config
