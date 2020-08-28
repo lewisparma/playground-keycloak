@@ -1,5 +1,6 @@
 import flask
 import urllib.parse
+import jwt
 
 app = flask.Flask(__name__)
 
@@ -40,6 +41,12 @@ HTML = """\
     </div>
     {% endif %}
 
+    {% if token %}
+    <div class="alert alert-dark">
+    Got token.
+    </div>
+    {% endif %}
+
     <div class="button-group">
      {% for k, v in links %}
      <a class="btn btn-primary" href="{{ v }}">{{ k }}</a>
@@ -56,6 +63,16 @@ HTML = """\
         <a class="btn btn-primary" href="{{ v }}">{{ k }}</a>
         {% endfor %}
       </div>
+
+      {% if token %}
+      <h1>Token:</h1>
+      <table border="1">
+        <tr><td>Header:</td><td><pre>{{ token.header | pprint }}</pre></td></tr>
+        <tr><td>Unverified body:</td><td><pre>{{ token.raw | pprint }}</pre></td></tr>
+      </table>
+      <pre>
+      </pre>
+      {% endif %}
 
       {% if args %}
       <h1>URL arguments:</h1>
@@ -130,6 +147,27 @@ def index():
 
 @app.route("/callback/", methods=['GET', 'POST'])
 def callback():
-    return render_page(what='login callback', links=[
+    links = []
+    token = flask.request.form.get('access_token') or flask.request.args.get('access_token')
+    if token:
+        links += [
+            ('Verify token', '../introspect/?' +
+                urllib.parse.urlencode(dict(token=token)),
+            ),
+        ]
+    return render_page(what='login callback', links=links + [
         ('Back to index', '..'),
     ])
+
+@app.route("/introspect/")
+def introspect():
+    token = flask.request.args['token']
+    hdr = jwt.get_unverified_header(token)
+    raw = jwt.decode(token, verify=False)
+    return render_page(what='token introspection',
+        token = dict(
+            header=hdr,
+            raw=raw,
+        ),
+        links=[('Back to index', '..')],
+    )
