@@ -1,0 +1,20 @@
+# keycloak-operator creates one, but with a bogus hostname of
+# "keycloak.local", and there doesn't seem to be a way to make that 'nil'
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ include "my-keycloak.fullname" . }}
+  labels:
+    {{- include "my-keycloak.labels" . | nindent 4 }}
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          serviceName: keycloak
+          servicePort: 8443
+        # there is no way to set the URL path prefix via operator
+        path: /auth/(.*)
