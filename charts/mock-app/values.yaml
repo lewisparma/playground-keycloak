@@ -49,11 +49,10 @@ ingress:
   annotations:
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
-  hosts:
-    - host:
-      paths:
-      - /mock-app/(.*)
+  # hostnames should be a single nil entry, i.e. any hostname
+  hostnames: [~]
+  paths:
+  - /mock-app/
 
   tls: []
   #  - secretName: chart-example-tls

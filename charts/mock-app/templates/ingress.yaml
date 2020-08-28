@@ -11,8 +11,9 @@ metadata:
   name: {{ $fullName }}
   labels:
 {{ include "webapp.labels" . | indent 4 }}
-  {{- with .Values.ingress.annotations }}
   annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+  {{- with .Values.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
@@ -27,15 +28,17 @@ spec:
   {{- end }}
 {{- end }}
   rules:
-  {{- range .Values.ingress.hosts }}
-    - host: {{ .host | quote }}
+  {{- with $ingress := .Values.ingress }}
+    {{- range $path := $ingress.paths }}
+      {{- range $host := $ingress.hostnames }}
+    - host: {{ $host | quote }}
       http:
         paths:
-        {{- range .paths }}
-          - path: {{ . }}
+          - path: {{ $path }}(.*)
             backend:
               serviceName: {{ $fullName }}
               servicePort: {{ $svcPort }}
-        {{- end }}
+      {{- end }}
+    {{- end }}
   {{- end }}
 {{- end }}

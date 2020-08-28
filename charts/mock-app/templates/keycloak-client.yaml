@@ -11,7 +11,14 @@ spec:
   client:
     clientId: {{ .Values.keycloak.clientId }}
     protocol: openid-connect
+{{/* TODO: ("https:" or "http:" + $host.host) prefix, if $host.host given */}}
     redirectUris:
-      - /mock-app/callback/
+{{- with $ingress := .Values.ingress }}
+  {{- range $path := $ingress.paths }}
+    {{- range $host := $ingress.hostnames }}
+      - {{ $path }}callback/
+    {{- end }}
+  {{- end }}
+{{- end }}
     implicitFlowEnabled: true
     standardFlowEnabled: true
