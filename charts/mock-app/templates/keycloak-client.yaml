@@ -12,6 +12,6 @@ spec:
     clientId: mock-web-app
     protocol: openid-connect
     redirectUris:
-      - /mock-app/
+      - /mock-app/callback/
     implicitFlowEnabled: true
     standardFlowEnabled: true

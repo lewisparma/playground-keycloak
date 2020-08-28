@@ -27,23 +27,53 @@ HTML = """\
     <div class="container" style="max-width: 90%">
       <div class="py-5 text-center">
       <h2>Mock app</h2>
-      <p class="lead">This is a mock web app</p>
+      {% if what %}
+      <p class="lead">This is the {{ what }} page.</p>
+      {% endif %}
     </div>
+    
+    {% if args.error %}
+    <div class="alert alert-danger">
+      IdP said:<br>
+      <b>Error:</b> {{ args.error }}<br>
+      <b>Error description:</b> {{ args.error_description }}<br>
+    </div>
+    {% endif %}
 
     <div class="button-group">
-      <a class="btn btn-primary" href="{{ login_url }}">Log in</a>
+     {% for k, v in links %}
+     <a class="btn btn-primary" href="{{ v }}">{{ k }}</a>
+     {% endfor %}
+
       <button type="button" class="btn btn-outline-info" data-toggle="collapse" data-target="#debugInfo">Debug info</button>
     </div>
 
     <div class="collapse" id="debugInfo">
       <hr class="mt-4">
 
+      <div class="button-group">
+        {% for k, v in debug_links %}
+        <a class="btn btn-primary" href="{{ v }}">{{ k }}</a>
+        {% endfor %}
+      </div>
+
+      {% if args %}
       <h1>URL arguments:</h1>
       <table border="1">
       {% for k, v in args.items() %}
         <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
       {% endfor %}
       </table>
+      {% endif %}
+
+      {% if form %}
+      <h1>Form:</h1>
+      <table border="1">
+      {% for k, v in form.items() %}
+        <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+      {% endfor %}
+      </table>
+      {% endif %}
 
       <h1>Headers:</h1>
       <table border="1">
@@ -64,21 +94,42 @@ TODO_IDP_URL = '/auth/realms/keysight/'
 TODO_CLIENT_ID = 'mock-web-app'
 
 def render_page(**kw):
-    return flask.render_template_string(HTML,
+    d = dict(
         args=flask.request.args,
+        form=flask.request.form,
         headers=flask.request.headers,
-        login_url=TODO_IDP_URL +
-            'protocol/openid-connect/auth?' +
-            urllib.parse.urlencode(dict(
-                client_id=TODO_CLIENT_ID,
-                redirect_uri=self_href(),
-                response_mode='query',
-                response_type='token',
-                scope='openid',
-                nonce='beef',
-            ))
+        what=None,
+        links=[],
+        debug_links=[],
     )
+    d.update(kw)
+    return flask.render_template_string(HTML, **d)
+
+def login_url(**kw):
+    args = dict(
+      client_id=TODO_CLIENT_ID,
+      redirect_uri=self_href() + 'callback/',
+      response_type='token',
+      scope='openid',
+      nonce='beef',
+    )
+    args.update(kw)
+    return TODO_IDP_URL + \
+        'protocol/openid-connect/auth?' + \
+         urllib.parse.urlencode(args)
 
 @app.route("/")
 def index():
-    return render_page()
+    return render_page(what='index', links=[
+        ('Login', login_url(response_mode='form_post')),
+    ], debug_links=[
+        ('Login (fragment)', login_url(reponse_mode='fragment')),
+        ('Login (query)', login_url(response_mode='query')),
+        ('Login (form_post)', login_url(response_mode='form_post')),
+    ])
+
+@app.route("/callback/", methods=['GET', 'POST'])
+def callback():
+    return render_page(what='login callback', links=[
+        ('Back to index', '..'),
+    ])

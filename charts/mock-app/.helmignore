@@ -21,3 +21,4 @@
 *.tmproj
 .vscode/
 *.pyc
+__pycache__
