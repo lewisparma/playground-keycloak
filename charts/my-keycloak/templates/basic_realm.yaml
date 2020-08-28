@@ -10,6 +10,29 @@ spec:
     realm: "keysight"
     enabled: True
     displayName: "Keysight Device"
+    users:
+      - username: "admin"
+        firstName: "Adminus"
+        lastName: "Admini"
+        email: "admin@example.org"
+        credentials:
+          - temporary: false
+            type: password
+            value: "admin"
+        enabled: True
+        emailVerified: False
+        realmRoles:
+          - "offline_access"
+          - "uma_authorization"
+        clientRoles:
+          account:
+            - "manage-account"
+            - "view-profile"
+          realm-management:
+            - "manage-users"
+            - "view-users"
+            - "query-users"
+            - "create-client"
   instanceSelector:
     matchLabels:
       {{- include "my-keycloak.labels" . | nindent 6 }}
