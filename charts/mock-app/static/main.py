@@ -118,9 +118,9 @@ HTML = """\
 MOCKAPP_CLIENT_ID = os.environ.get('MOCKAPP_CLIENT_ID', 'todo-client-id')
 # This could be absolute (but typically is not):
 MOCKAPP_IDP_PATH = os.environ.get('MOCKAPP_IDP_PATH', '/todo-idp/')
-# TODO: build_url() on this.  if IdP URL is relative, use the internal ingress; if absolute, use it as-is.
-MOCKAPP_IDP_INTERNAL_URL = os.environ.get('MOCKAPP_IDP_INTERNAL_URL',
-    'http://kcos-framework-v1-nginx-ingress-controller.kcos-framework.svc%s' % MOCKAPP_IDP_PATH)
+MOCKAPP_INTERNAL_BASE_URL = os.environ.get('MOCKAPP_INTERNAL_BASE_URL', 'http://nginx-ingress.default.svc')
+
+MOCKAPP_IDP_INTERNAL_URL = urllib.parse.urljoin(MOCKAPP_INTERNAL_BASE_URL, MOCKAPP_IDP_PATH)
 
 def render_page(**kw):
     d = dict(
@@ -143,6 +143,7 @@ def login_url(**kw):
       nonce='beef',
     )
     args.update(kw)
+    # TODO: get this path from .well-known authorization_endpoint
     return MOCKAPP_IDP_PATH + \
         'protocol/openid-connect/auth?' + \
          urllib.parse.urlencode(args)
@@ -151,6 +152,8 @@ def login_url(**kw):
 def index():
     return render_page(what='index', links=[
         ('Login', login_url(response_mode='form_post')),
+        # TODO: get this from .well-known end_session_endpoint
+        # TODO: use XHR, this doesn't render a page
         ('Logout', MOCKAPP_IDP_PATH + 'protocol/openid-connect/logout'),
     ], debug_links=[
         ('Login (fragment)', login_url(reponse_mode='fragment')),

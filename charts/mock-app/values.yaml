@@ -10,6 +10,8 @@ image:
   pullPolicy: IfNotPresent
 
 keycloak:
+  # base URL prefix where the ingress controller can be reached at
+  internalBaseUrl: "http://ingress.default.svc"
   clientId: mock-web-app
   baseUrl: "/auth/"
   realm: keysight

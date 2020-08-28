@@ -37,6 +37,7 @@ releases:
   - auth/operator
   values:
   - keycloak:
+      internalBaseUrl: http://kcos-framework-v1-nginx-ingress-controller.kcos-framework.svc
       realmLabels:
         app.kubernetes.io/name: my-keycloak
         app.kubernetes.io/instance: sso
