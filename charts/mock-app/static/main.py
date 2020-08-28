@@ -115,11 +115,12 @@ HTML = """\
 </html>
 """
 
-TODO_IDP_URL = '/auth/realms/keysight/'
 MOCKAPP_CLIENT_ID = os.environ.get('MOCKAPP_CLIENT_ID', 'todo-client-id')
+# This could be absolute (but typically is not):
+MOCKAPP_IDP_PATH = os.environ.get('MOCKAPP_IDP_PATH', '/todo-idp/')
 # TODO: build_url() on this.  if IdP URL is relative, use the internal ingress; if absolute, use it as-is.
-TODO_IDP_INTERNAL_URL = os.environ.get('MOCKAPP_IDP_INTERNAL_URL',
-    'http://kcos-framework-v1-nginx-ingress-controller.kcos-framework.svc%s' % TODO_IDP_URL)
+MOCKAPP_IDP_INTERNAL_URL = os.environ.get('MOCKAPP_IDP_INTERNAL_URL',
+    'http://kcos-framework-v1-nginx-ingress-controller.kcos-framework.svc%s' % MOCKAPP_IDP_PATH)
 
 def render_page(**kw):
     d = dict(
@@ -142,7 +143,7 @@ def login_url(**kw):
       nonce='beef',
     )
     args.update(kw)
-    return TODO_IDP_URL + \
+    return MOCKAPP_IDP_PATH + \
         'protocol/openid-connect/auth?' + \
          urllib.parse.urlencode(args)
 
@@ -150,7 +151,7 @@ def login_url(**kw):
 def index():
     return render_page(what='index', links=[
         ('Login', login_url(response_mode='form_post')),
-        ('Logout', TODO_IDP_URL + 'protocol/openid-connect/logout'),
+        ('Logout', MOCKAPP_IDP_PATH + 'protocol/openid-connect/logout'),
     ], debug_links=[
         ('Login (fragment)', login_url(reponse_mode='fragment')),
         ('Login (query)', login_url(response_mode='query')),
@@ -176,7 +177,7 @@ def verify_token(hdr, token, dbg):
     assert hdr['alg'] == 'RS256', "Only RS256 alg supported for now"
     kid = hdr['kid']
     # TODO: cache
-    dbg['OpenID configuration URL'] = cfg_url = TODO_IDP_INTERNAL_URL + '.well-known/openid-configuration'
+    dbg['OpenID configuration URL'] = cfg_url = MOCKAPP_IDP_INTERNAL_URL + '.well-known/openid-configuration'
     dbg['OpenID configuration'] = openid_config = requests.get(cfg_url).json()
     dbg['JWKS URL'] = jwks_uri = openid_config['jwks_uri']
     dbg['JWKS data'] = jwks = requests.get(jwks_uri).json()

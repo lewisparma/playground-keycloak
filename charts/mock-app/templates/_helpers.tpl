@@ -54,3 +54,12 @@ Create the name of the service account to use
     {{ default "default" .Values.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
+
+
+{{- define "webapp.idpPath" -}}
+{{- if .Values.keycloak.idpPathOverride -}}
+{{- .Values.keycloak.idpPathOverride -}}
+{{- else -}}
+{{- printf "%srealms/%s/" .Values.keycloak.baseUrl .Values.keycloak.realm -}}
+{{- end -}}
+{{- end -}}

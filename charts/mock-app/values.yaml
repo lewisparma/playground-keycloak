@@ -11,6 +11,9 @@ image:
 
 keycloak:
   clientId: mock-web-app
+  baseUrl: "/auth/"
+  realm: keysight
+  # idpPathOverride: "/hacked-idp/realms/foo/"
   realmLabels: {}
 
 imagePullSecrets: []

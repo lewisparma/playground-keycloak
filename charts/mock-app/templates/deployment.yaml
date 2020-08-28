@@ -43,6 +43,8 @@ spec:
             value: debug
           - name: MOCKAPP_CLIENT_ID
             value: {{ .Values.keycloak.clientId | quote }}
+          - name: MOCKAPP_IDP_PATH
+            value: {{ include "webapp.idpPath" . }}
           volumeMounts:
             - name: web-data
               mountPath: /app
