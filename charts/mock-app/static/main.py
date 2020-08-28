@@ -7,6 +7,8 @@ import os
 
 app = flask.Flask(__name__)
 
+MOCKAPP_FULLNAME = os.environ.get('MOCKAPP_FULLNAME')
+
 def self_href():
     return '%s://%s%s' % (
         flask.request.headers.get('X-Scheme') or
@@ -30,7 +32,7 @@ HTML = """\
   <body class="bg-light">
     <div class="container" style="max-width: 90%">
       <div class="py-5 text-center">
-      <h2>Mock app</h2>
+      <h2>Mock app {{ fullname }}</h2>
       {% if what %}
       <p class="lead">This is the {{ what }} page.</p>
       {% endif %}
@@ -127,6 +129,7 @@ def render_page(**kw):
         args=flask.request.args,
         form=flask.request.form,
         headers=flask.request.headers,
+        fullname=MOCKAPP_FULLNAME,
         what=None,
         links=[],
         debug_links=[],
