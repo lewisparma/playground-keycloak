@@ -24,3 +24,8 @@ releases:
   chart: ./charts/keycloak-operator
   needs:
   - default/config
+- name: sso
+  namespace: auth
+  chart: ./charts/my-keycloak
+  needs:
+  - auth/operator
