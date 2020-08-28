@@ -39,14 +39,10 @@ spec:
           env:
           - name: WEB_CONCURRENCY
             value: "2"
-          - name: LSHW_SERVICE_NAME
-            value: {{ include "webapp.fullname" .  | quote }}
           - name: LOG_LEVEL
             value: debug
-          - name: KUBE_NODE_NAME
-            valueFrom:
-              fieldRef:
-                fieldPath: spec.nodeName
+          - name: MOCKAPP_CLIENT_ID
+            value: {{ .Values.keycloak.clientId | quote }}
           volumeMounts:
             - name: web-data
               mountPath: /app

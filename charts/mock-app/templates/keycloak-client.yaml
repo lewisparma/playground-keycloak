@@ -9,7 +9,7 @@ spec:
     matchLabels:
       {{- toYaml .Values.keycloak.realmLabels | nindent 6 }}
   client:
-    clientId: mock-web-app
+    clientId: {{ .Values.keycloak.clientId }}
     protocol: openid-connect
     redirectUris:
       - /mock-app/callback/

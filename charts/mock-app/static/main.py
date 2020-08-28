@@ -116,7 +116,7 @@ HTML = """\
 """
 
 TODO_IDP_URL = '/auth/realms/keysight/'
-TODO_CLIENT_ID = 'mock-web-app'
+MOCKAPP_CLIENT_ID = os.environ.get('MOCKAPP_CLIENT_ID', 'todo-client-id')
 # TODO: build_url() on this.  if IdP URL is relative, use the internal ingress; if absolute, use it as-is.
 TODO_IDP_INTERNAL_URL = os.environ.get('MOCKAPP_IDP_INTERNAL_URL',
     'http://kcos-framework-v1-nginx-ingress-controller.kcos-framework.svc%s' % TODO_IDP_URL)
@@ -135,7 +135,7 @@ def render_page(**kw):
 
 def login_url(**kw):
     args = dict(
-      client_id=TODO_CLIENT_ID,
+      client_id=MOCKAPP_CLIENT_ID,
       redirect_uri=self_href() + 'callback/',
       response_type='token',
       scope='openid',
@@ -186,7 +186,7 @@ def verify_token(hdr, token, dbg):
             # TODO: is that the right 'aud'?
             res = jwt.decode(token, pubkey, algorithms=[hdr['alg']], audience='account')
             azp = res['azp']
-            assert azp == TODO_CLIENT_ID, "Token not for us (got %r, expected %r)" % (azp, TODO_CLIENT_ID)
+            assert azp == MOCKAPP_CLIENT_ID, "Token not for us (got %r, expected %r)" % (azp, MOCKAPP_CLIENT_ID)
             return res
     raise ValueError('kid %r not in JWKS keyring' % kid)
 
