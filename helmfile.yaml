@@ -29,3 +29,9 @@ releases:
   chart: ./charts/my-keycloak
   needs:
   - auth/operator
+- name: app
+  # TODO: other ns?
+  namespace: auth
+  chart: ./charts/mock-app
+  needs:
+  - auth/operator
