@@ -12,11 +12,12 @@ image:
 keycloak:
   # base URL prefix where the ingress controller can be reached at
   internalBaseUrl: "http://ingress.default.svc"
-  clientId: mock-web-app
   baseUrl: "/auth/"
   realm: keysight
   # idpPathOverride: "/hacked-idp/realms/foo/"
   realmLabels: {}
+
+# clientIdOverride: mock-web-app
 
 imagePullSecrets: []
 nameOverride: ""

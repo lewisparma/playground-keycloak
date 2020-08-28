@@ -63,3 +63,11 @@ Create the name of the service account to use
 {{- printf "%srealms/%s/" .Values.keycloak.baseUrl .Values.keycloak.realm -}}
 {{- end -}}
 {{- end -}}
+
+{{- define "webapp.clientId" -}}
+{{- if .Values.clientIdOverride -}}
+{{- .Values.clientIdOverride -}}
+{{- else -}}
+{{- include "webapp.fullname" . -}}
+{{- end -}}
+{{- end -}}

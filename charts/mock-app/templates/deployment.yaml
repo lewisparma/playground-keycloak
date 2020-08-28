@@ -42,7 +42,7 @@ spec:
           - name: LOG_LEVEL
             value: debug
           - name: MOCKAPP_CLIENT_ID
-            value: {{ .Values.keycloak.clientId | quote }}
+            value: {{ quote (include "webapp.clientId" .) }}
           - name: MOCKAPP_IDP_PATH
             value: {{ quote (include "webapp.idpPath" .) }}
           - name: MOCKAPP_INTERNAL_BASE_URL
