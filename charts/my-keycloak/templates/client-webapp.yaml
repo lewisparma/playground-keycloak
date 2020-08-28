@@ -1,0 +1,17 @@
+apiVersion: keycloak.org/v1alpha1
+kind: KeycloakClient
+metadata:
+  name: {{ include "my-keycloak.fullname" . }}-mock-web-client
+  labels:
+    {{- include "my-keycloak.labels" . | nindent 4 }}
+spec:
+  realmSelector:
+    matchLabels:
+      {{- include "my-keycloak.labels" . | nindent 6 }}
+  client:
+    clientId: mock-web-app
+    protocol: openid-connect
+    redirectUris:
+      - /mock-app/
+    implicitFlowEnabled: true
+    standardFlowEnabled: true
