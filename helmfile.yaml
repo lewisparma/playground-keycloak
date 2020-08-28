@@ -35,3 +35,8 @@ releases:
   chart: ./charts/mock-app
   needs:
   - auth/operator
+  values:
+  - keycloak:
+      realmLabels:
+        app.kubernetes.io/name: my-keycloak
+        app.kubernetes.io/instance: sso

@@ -9,6 +9,9 @@ image:
   tag: python3.7
   pullPolicy: IfNotPresent
 
+keycloak:
+  realmLabels: {}
+
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""

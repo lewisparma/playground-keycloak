@@ -1,13 +1,13 @@
 apiVersion: keycloak.org/v1alpha1
 kind: KeycloakClient
 metadata:
-  name: {{ include "my-keycloak.fullname" . }}-mock-web-client
+  name: {{ include "webapp.fullname" . }}-mock-web-client
   labels:
-    {{- include "my-keycloak.labels" . | nindent 4 }}
+    {{- include "webapp.labels" . | nindent 4 }}
 spec:
   realmSelector:
     matchLabels:
-      {{- include "my-keycloak.labels" . | nindent 6 }}
+      {{- toYaml .Values.keycloak.realmLabels | nindent 6 }}
   client:
     clientId: mock-web-app
     protocol: openid-connect
