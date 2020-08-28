@@ -31,6 +31,7 @@ HTML = """\
     </div>
 
     <div class="button-group">
+      <a class="btn btn-primary" href="{{ login_url }}">Log in</a>
       <button type="button" class="btn btn-outline-info" data-toggle="collapse" data-target="#debugInfo">Debug info</button>
     </div>
 
@@ -59,11 +60,24 @@ HTML = """\
 </html>
 """
 
+TODO_IDP_URL = '/auth/realms/keysight/'
+TODO_CLIENT_ID = 'mock-web-app'
+
 def render_page(**kw):
     return flask.render_template_string(HTML,
         args=flask.request.args,
         headers=flask.request.headers,
-        **kw)
+        login_url=TODO_IDP_URL +
+            'protocol/openid-connect/auth?' +
+            urllib.parse.urlencode(dict(
+                client_id=TODO_CLIENT_ID,
+                redirect_uri=self_href(),
+                response_mode='query',
+                response_type='token',
+                scope='openid',
+                nonce='beef',
+            ))
+    )
 
 @app.route("/")
 def index():
