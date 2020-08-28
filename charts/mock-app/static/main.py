@@ -8,6 +8,13 @@ import os
 app = flask.Flask(__name__)
 
 MOCKAPP_FULLNAME = os.environ.get('MOCKAPP_FULLNAME')
+MOCKAPP_CLIENT_ID = os.environ.get('MOCKAPP_CLIENT_ID', 'todo-client-id')
+# This could be absolute (but typically is not):
+MOCKAPP_IDP_PATH = os.environ.get('MOCKAPP_IDP_PATH', '/todo-idp/')
+MOCKAPP_INTERNAL_BASE_URL = os.environ.get('MOCKAPP_INTERNAL_BASE_URL', 'http://nginx-ingress.default.svc')
+
+MOCKAPP_IDP_INTERNAL_URL = urllib.parse.urljoin(MOCKAPP_INTERNAL_BASE_URL, MOCKAPP_IDP_PATH)
+
 
 def self_href():
     return '%s://%s%s' % (
@@ -116,13 +123,6 @@ HTML = """\
   </body>
 </html>
 """
-
-MOCKAPP_CLIENT_ID = os.environ.get('MOCKAPP_CLIENT_ID', 'todo-client-id')
-# This could be absolute (but typically is not):
-MOCKAPP_IDP_PATH = os.environ.get('MOCKAPP_IDP_PATH', '/todo-idp/')
-MOCKAPP_INTERNAL_BASE_URL = os.environ.get('MOCKAPP_INTERNAL_BASE_URL', 'http://nginx-ingress.default.svc')
-
-MOCKAPP_IDP_INTERNAL_URL = urllib.parse.urljoin(MOCKAPP_INTERNAL_BASE_URL, MOCKAPP_IDP_PATH)
 
 def render_page(**kw):
     d = dict(
