@@ -1,6 +1,9 @@
 import flask
 import urllib.parse
 import jwt
+import requests
+import json
+import os
 
 app = flask.Flask(__name__)
 
@@ -42,9 +45,15 @@ HTML = """\
     {% endif %}
 
     {% if token %}
-    <div class="alert alert-dark">
-    Got token.
-    </div>
+      {% if token.ok %}
+        <div class="alert alert-dark">
+        Got legit token. Welcome, <i>{{ token.data.name }}</i>!
+        </div>
+      {% else %}
+      <div class="alert alert-danger">
+          <b>Token verification failed:</b> {{ token.err }}
+      </div>
+      {% endif %}
     {% endif %}
 
     <div class="button-group">
@@ -67,11 +76,10 @@ HTML = """\
       {% if token %}
       <h1>Token:</h1>
       <table border="1">
-        <tr><td>Header:</td><td><pre>{{ token.header | pprint }}</pre></td></tr>
-        <tr><td>Unverified body:</td><td><pre>{{ token.raw | pprint }}</pre></td></tr>
+        {% for k, v in token.dbg.items() %}
+          <tr><td>{{ k }}:</td><td><pre>{{ v | pprint }}</pre></td></tr>
+        {% endfor %}
       </table>
-      <pre>
-      </pre>
       {% endif %}
 
       {% if args %}
@@ -109,6 +117,9 @@ HTML = """\
 
 TODO_IDP_URL = '/auth/realms/keysight/'
 TODO_CLIENT_ID = 'mock-web-app'
+# TODO: build_url() on this.  if IdP URL is relative, use the internal ingress; if absolute, use it as-is.
+TODO_IDP_INTERNAL_URL = os.environ.get('MOCKAPP_IDP_INTERNAL_URL',
+    'http://kcos-framework-v1-nginx-ingress-controller.kcos-framework.svc%s' % TODO_IDP_URL)
 
 def render_page(**kw):
     d = dict(
@@ -139,6 +150,7 @@ def login_url(**kw):
 def index():
     return render_page(what='index', links=[
         ('Login', login_url(response_mode='form_post')),
+        ('Logout', TODO_IDP_URL + 'protocol/openid-connect/logout'),
     ], debug_links=[
         ('Login (fragment)', login_url(reponse_mode='fragment')),
         ('Login (query)', login_url(response_mode='query')),
@@ -159,15 +171,45 @@ def callback():
         ('Back to index', '..'),
     ])
 
+def verify_token(hdr, token, dbg):
+    assert hdr['typ'] == 'JWT', "JWT type is not JWT"
+    assert hdr['alg'] == 'RS256', "Only RS256 alg supported for now"
+    kid = hdr['kid']
+    # TODO: cache
+    dbg['OpenID configuration URL'] = cfg_url = TODO_IDP_INTERNAL_URL + '.well-known/openid-configuration'
+    dbg['OpenID configuration'] = openid_config = requests.get(cfg_url).json()
+    dbg['JWKS URL'] = jwks_uri = openid_config['jwks_uri']
+    dbg['JWKS data'] = jwks = requests.get(jwks_uri).json()
+    for key in jwks['keys']:
+        if key['kid'] == kid:
+            pubkey = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(key))
+            # TODO: is that the right 'aud'?
+            res = jwt.decode(token, pubkey, algorithms=[hdr['alg']], audience='account')
+            azp = res['azp']
+            assert azp == TODO_CLIENT_ID, "Token not for us (got %r, expected %r)" % (azp, TODO_CLIENT_ID)
+            return res
+    raise ValueError('kid %r not in JWKS keyring' % kid)
+
 @app.route("/introspect/")
 def introspect():
-    token = flask.request.args['token']
-    hdr = jwt.get_unverified_header(token)
-    raw = jwt.decode(token, verify=False)
+    token_str = flask.request.args['token']
+    dbg = {}
+    dbg['Header'] = hdr = jwt.get_unverified_header(token_str)
+    dbg['Raw body'] = jwt.decode(token_str, verify=False)
+    try:
+        data = verify_token(hdr, token_str, dbg)
+        ok = True
+        err = ''
+    except Exception as e:
+        ok = False
+        err = '%r -- %s' % (e, e)
+        data = {}
     return render_page(what='token introspection',
         token = dict(
-            header=hdr,
-            raw=raw,
+            dbg=dbg,
+            ok=ok,
+            err=err,
+            data=data,
         ),
         links=[('Back to index', '..')],
     )
