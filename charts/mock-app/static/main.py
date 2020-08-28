@@ -9,7 +9,7 @@ def self_href():
         flask.request.headers.get('X-Forwarded-Proto') or
         'http',
         flask.request.headers.get('Host'),
-        flask.request.headers.get('X-Original-Uri') or
+        flask.request.headers.get('X-Original-Uri', '').split('?', 1)[0] or
         flask.request.path,
     )
 
