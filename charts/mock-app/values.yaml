@@ -10,6 +10,10 @@ image:
   pullPolicy: IfNotPresent
 
 keycloak:
+  # if true, create KeycloakClient object
+  enabled: true
+  # if present, create KeycloakClient in given namespace
+  # namespace:
   # base URL prefix where the ingress controller can be reached at
   internalBaseUrl: "http://ingress.default.svc"
   baseUrl: "/auth/"

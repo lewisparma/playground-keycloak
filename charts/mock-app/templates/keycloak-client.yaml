@@ -1,7 +1,11 @@
+{{- if .Values.keycloak.enabled -}}
 apiVersion: keycloak.org/v1alpha1
 kind: KeycloakClient
 metadata:
   name: {{ include "webapp.fullname" . }}-mock-web-client
+{{- with .Values.keycloak.namespace }}
+  namespace: {{ . }}
+{{- end }}
   labels:
     {{- include "webapp.labels" . | nindent 4 }}
 spec:
@@ -22,3 +26,4 @@ spec:
 {{- end }}
     implicitFlowEnabled: true
     standardFlowEnabled: true
+{{- end -}}

@@ -19,6 +19,12 @@ releases:
         name: auth
         labels:
           deployment.kcos.keysight.com/namespace: auth
+    - apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: app2ns
+        labels:
+          deployment.kcos.keysight.com/namespace: app2ns
 - name: operator
   namespace: auth
   chart: ./charts/keycloak-operator
@@ -41,3 +47,19 @@ releases:
       realmLabels:
         app.kubernetes.io/name: my-keycloak
         app.kubernetes.io/instance: sso
+- name: app2
+  # TODO: other ns?
+  namespace: app2ns
+  chart: ./charts/mock-app
+  needs:
+  - auth/operator
+  values:
+  - keycloak:
+      namespace: auth
+      internalBaseUrl: http://kcos-framework-v1-nginx-ingress-controller.kcos-framework.svc
+      realmLabels:
+        app.kubernetes.io/name: my-keycloak
+        app.kubernetes.io/instance: sso
+    ingress:
+      paths:
+      - /mock-different-app/
