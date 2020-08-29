@@ -69,6 +69,9 @@ HTML = """\
      {% for k, v in links %}
      <a class="btn btn-primary" href="{{ v }}">{{ k }}</a>
      {% endfor %}
+     {% for k, v in extra_links %}
+     <a class="btn btn-secondary" href="{{ v }}">{{ k }}</a>
+     {% endfor %}
 
       <button type="button" class="btn btn-outline-info" data-toggle="collapse" data-target="#debugInfo">Debug info</button>
     </div>
@@ -158,6 +161,10 @@ def index():
         # TODO: get this from .well-known end_session_endpoint
         # TODO: use XHR, this doesn't render a page
         ('Logout', MOCKAPP_IDP_PATH + 'protocol/openid-connect/logout'),
+    ], extra_links=[
+        # these are very keycloak specific
+        ('Account page', MOCKAPP_IDP_PATH + 'account/'),
+        ('Realm admin console', MOCKAPP_IDP_PATH.replace('/realms/', '/admin/') + 'console/'),
     ], debug_links=[
         ('Login (fragment)', login_url(reponse_mode='fragment')),
         ('Login (query)', login_url(response_mode='query')),
