@@ -164,20 +164,6 @@ def index():
         ('Login (form_post)', login_url(response_mode='form_post')),
     ])
 
-@app.route("/callback/", methods=['GET', 'POST'])
-def callback():
-    links = []
-    token = flask.request.form.get('access_token') or flask.request.args.get('access_token')
-    if token:
-        links += [
-            ('Verify token', '../introspect/?' +
-                urllib.parse.urlencode(dict(token=token)),
-            ),
-        ]
-    return render_page(what='login callback', links=links + [
-        ('Back to index', '..'),
-    ])
-
 def verify_token(hdr, token, dbg):
     assert hdr['typ'] == 'JWT', "JWT type is not JWT"
     assert hdr['alg'] == 'RS256', "Only RS256 alg supported for now"
@@ -197,9 +183,7 @@ def verify_token(hdr, token, dbg):
             return res
     raise ValueError('kid %r not in JWKS keyring' % kid)
 
-@app.route("/introspect/")
-def introspect():
-    token_str = flask.request.args['token']
+def do_introspect(what='token introspection', token_str=None):
     dbg = {}
     dbg['Header'] = hdr = jwt.get_unverified_header(token_str)
     dbg['Raw body'] = jwt.decode(token_str, verify=False)
@@ -211,7 +195,7 @@ def introspect():
         ok = False
         err = '%r -- %s' % (e, e)
         data = {}
-    return render_page(what='token introspection',
+    return render_page(what=what,
         token = dict(
             dbg=dbg,
             ok=ok,
@@ -220,3 +204,26 @@ def introspect():
         ),
         links=[('Back to index', '..')],
     )
+
+@app.route("/introspect/")
+def introspect():
+    return do_introspect(
+        what='token introspection',
+        token_str=flask.request.args['token'],
+    )
+
+@app.route("/callback/", methods=['GET', 'POST'])
+def callback():
+    links = []
+    token = flask.request.form.get('access_token') or flask.request.args.get('access_token')
+    if token:
+        links += [
+            ('Verify token', '../introspect/?' +
+                urllib.parse.urlencode(dict(token=token)),
+            ),
+        ]
+        if True: # HACK
+          return do_introspect(what='login callback', token_str=token)
+    return render_page(what='login callback', links=links + [
+        ('Back to index', '..'),
+    ])
