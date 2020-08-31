@@ -15,6 +15,8 @@ Under `charts/`:
 * `mock-app` deploys a sample application, as well as a KeycloakClient for
   itself in The One Realm; there can be several of these per appliance
 
+There's also a main `helmfile.yaml` to tie them all together.  `helmfile sync`
+on a bare cluster (but with nginx-ingress and CNI installed) for a quickstart.
 
 ## Notes
 
