@@ -1,5 +1,21 @@
 # keycloak-operator playground
 
+## What's this?
+
+It's a sandbox to try out interfacing with Keyclock as oauth2 IdP, and
+the keycloak-operator for deployment as well.
+
+Under `charts/`:
+* `keycloak-operator` is just a repackage of the upstream operator
+  deployment yamls (because it's a lot easier to `helmfile sync` the whole
+  thing)
+* `my-keycloak` deploys (configs for the operator in order to get) a Keycloak
+  service instance, as well as a single Realm -- we'd expect exactly one
+  of these per appliance
+* `mock-app` deploys a sample application, as well as a KeycloakClient for
+  itself in The One Realm; there can be several of these per appliance
+
+
 ## Notes
 
 * `Ingress` provided by operator has wrong hostname; workaround: provide our own `Ingress`
