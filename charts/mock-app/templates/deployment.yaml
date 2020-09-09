@@ -49,6 +49,12 @@ spec:
             value: {{ .Values.keycloak.internalBaseUrl | quote }}
           - name: MOCKAPP_FULLNAME
             value: {{ quote (include "webapp.fullname" .) }}
+{{- with $ingress := .Values.ingress }}
+  {{- range $idx, $path := $ingress.paths }}
+          - name: MOCKAPP_SELF_PATH_{{ $idx }}
+            value: {{ $path | quote }}
+  {{- end }}
+{{- end }}
           volumeMounts:
             - name: web-data
               mountPath: /app

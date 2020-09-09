@@ -19,7 +19,9 @@ if __name__ == "__main__":
     with open(fname, 'w') as fp:
        pass
 
-    url = '/mock-app/cli/%s' % nonce
+    # TODO: multiple Ingress paths? nah.
+    self_path = os.environ.get("MOCKAPP_SELF_PATH_0", "/todo-app-path/")
+    url = '%scli/%s' % (self_path, nonce)
     print("\nWelcome, adventurer!\nTo log in, please use your browser and navigate to:\n\n"
         "    <however you reach this machine> %s" % url)
     try:
