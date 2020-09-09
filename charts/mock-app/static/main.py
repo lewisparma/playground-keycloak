@@ -4,6 +4,7 @@ import jwt
 import requests
 import json
 import os
+import os.path
 
 app = flask.Flask(__name__)
 
@@ -57,6 +58,9 @@ HTML = """\
       {% if token.ok %}
         <div class="alert alert-dark">
         Got legit token. Welcome, <i>{{ token.data.name }}</i>!
+        {% if token.shell %}
+        <h3>You may now return to your CLI terminal.</h3>
+        {% endif %}
         </div>
       {% else %}
       <div class="alert alert-danger">
@@ -171,6 +175,14 @@ def index():
         ('Login (form_post)', login_url(response_mode='form_post')),
     ])
 
+@app.route('/cli/<nonce>')
+def cli_login(nonce):
+    return flask.redirect(login_url(
+        response_mode='form_post',
+        nonce='shell.%s' % nonce,
+        redirect_uri=urllib.parse.urljoin(self_href(), '../callback/'),
+    ))
+
 def verify_token(hdr, token, dbg):
     assert hdr['typ'] == 'JWT', "JWT type is not JWT"
     assert hdr['alg'] == 'RS256', "Only RS256 alg supported for now"
@@ -194,8 +206,18 @@ def do_introspect(what='token introspection', token_str=None):
     dbg = {}
     dbg['Header'] = hdr = jwt.get_unverified_header(token_str)
     dbg['Raw body'] = jwt.decode(token_str, verify=False)
+    shell = False
     try:
         data = verify_token(hdr, token_str, dbg)
+        nonce = data.get('nonce', '')
+        if nonce.startswith('shell.'):
+            fname = nonce.split('.', 1)[-1].replace('/', '_')
+            fname = '/tmp/mock.token.%s' % fname
+            if os.path.exists(fname):
+                with open(fname, 'w') as fp:
+                    fp.write(json.dumps(data))
+                shell = True
+                dbg['Token file'] = fname
         ok = True
         err = ''
     except Exception as e:
@@ -208,6 +230,7 @@ def do_introspect(what='token introspection', token_str=None):
             ok=ok,
             err=err,
             data=data,
+            shell=shell,
         ),
         links=[('Back to index', '..')],
     )
