@@ -6,6 +6,8 @@ import random
 import string
 import requests
 import time
+import jwt
+import pprint
 
 def rand_str(length):
     letters_and_digits = string.ascii_letters + string.digits
@@ -38,4 +40,18 @@ if __name__ == "__main__":
        sys.stdout.flush()
        spin += 1
        time.sleep(0.1)
-    print("\nGot one!\n\n%s" % buf)
+    print("\nGot one!\n\n%s\n" % buf)
+
+    # TODO: verify against JWKS
+    # (in this particular skeleton, the web app already did that)
+    # (but of course we're not protecting the token file in any meaningful way)
+    data = jwt.decode(buf, verify=False)
+    pprint.pprint(data)
+    print()
+
+    username = data.get('username', data.get('preferred_username'))
+    name = data.get('name', username)
+    if name:
+        print("Welcome %s!" % name)
+    if username:
+        print("You seem to be logging in as '%s'" % username)

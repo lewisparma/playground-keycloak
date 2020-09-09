@@ -216,7 +216,7 @@ def do_introspect(what='token introspection', token_str=None):
             fname = '/tmp/mock.token.%s' % fname
             if os.path.exists(fname):
                 with open(fname, 'w') as fp:
-                    fp.write(json.dumps(data))
+                    fp.write(token_str)
                 shell = True
                 dbg['Token file'] = fname
         ok = True
