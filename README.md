@@ -35,3 +35,6 @@ for a quickstart.
 * operator doesn't handle all cases, e.g. `KeycloakRealm` created after `KeycloakClient`
   (client is not created -- it is after restarting the operator though)
 * account/ page operations seem to say "An internal server error has occurred" on any changes
+* to enable debugging, one can set `$KEYCLOAK_LOGLEVEL=DEBUG` and/or
+  `$ROOT_LOGLEVEL=DEBUG` on the `StatefulSet` `env`; but! need to kill the operator,
+  otherwise it nukes them off
