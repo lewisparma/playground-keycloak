@@ -8,10 +8,30 @@ import requests
 import time
 import jwt
 import pprint
+import socket
 
 def rand_str(length):
     letters_and_digits = string.ascii_letters + string.digits
     return ''.join((random.choice(letters_and_digits) for i in range(length)))
+
+def who_am_i():
+    "The returned list is, by definition, incomplete."
+    try:
+        name = requests.get("http://kcos-framework-vital.kcos-framework.svc/v1/hostname").json()["name"]
+    except:
+        return []
+    res = set([name])
+    # TODO: query this from vital-service
+    try:
+        gai = socket.getaddrinfo(name, 0, socket.AF_UNSPEC, socket.SOCK_STREAM, 0, socket.AI_PASSIVE | socket.AI_CANONNAME)
+        for family, socktype, proto, canonname, (host, port) in gai:
+            if family == socket.AF_INET6:
+                host = '[%s]' % host
+            res.add(host)
+            res.add(canonname)
+    except:
+        pass
+    return res
 
 if __name__ == "__main__":
     nonce = rand_str(16)
@@ -24,11 +44,11 @@ if __name__ == "__main__":
     url = '%scli/%s' % (self_path, nonce)
     print("\nWelcome, adventurer!\nTo log in, please use your browser and navigate to:\n\n"
         "    <however you reach this machine> %s" % url)
-    try:
-        name = requests.get("http://kcos-framework-vital.kcos-framework.svc/v1/hostname").json()["name"]
-        print("\n\nFor example, one of the following:\n\n    https://%s%s" % (name, url))
-    except:
-        pass
+    names = who_am_i()
+    if names:
+        print("\nFor example, one of the following:\n")
+        for name in names:
+            print("    https://%s%s" % (name, url))
 
     spin = 0
     while True:
