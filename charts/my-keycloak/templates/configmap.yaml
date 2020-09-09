@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "my-keycloak.fullname" . }}-web-data
+  labels:
+{{ include "my-keycloak.labels" . | indent 4 }}
+data:
+{{ $root := . }}
+{{ range $name, $content := .Files.Glob "static/**" }}
+  {{ base $name | quote }}: |
+{{ $root.Files.Get $name | indent 4 }}{{ end }}

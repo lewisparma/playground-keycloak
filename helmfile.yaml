@@ -1,5 +1,5 @@
 helmDefaults:
-  wait: true
+  wait: false
   args:
   - "-v=7"
 
@@ -30,6 +30,18 @@ releases:
   chart: ./charts/keycloak-operator
   needs:
   - default/config
+- name: webpage
+  namespace: auth
+  chart: bitnami/nginx
+  needs:
+  - default/config
+  values:
+  - ingress:
+      enabled: true
+      hosts:
+      - name:
+        path: /
+    staticSiteConfigmap: sso-my-keycloak-web-data
 - name: sso
   namespace: auth
   chart: ./charts/my-keycloak
