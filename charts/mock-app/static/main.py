@@ -177,11 +177,12 @@ def index():
 
 @app.route('/cli/<nonce>')
 def cli_login(nonce):
-    return flask.redirect(login_url(
+    path = login_url(
         response_mode='form_post',
         nonce='shell.%s' % nonce,
         redirect_uri=urllib.parse.urljoin(self_href(), '../callback/'),
-    ))
+    )
+    return flask.redirect(urllib.parse.urljoin(self_href(), path))
 
 def verify_token(hdr, token, dbg):
     assert hdr['typ'] == 'JWT', "JWT type is not JWT"
