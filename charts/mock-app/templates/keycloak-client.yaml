@@ -26,4 +26,14 @@ spec:
 {{- end }}
     implicitFlowEnabled: true
     standardFlowEnabled: true
+    serviceAccountsEnabled: true
+    directAccessGrantsEnabled: true
+    # TODO: set up a secret that we can know
+    # i) adding 'secret: string' here sets the literal string as the secret
+    #    -- but only when creating the Client; operator never updates it
+    #    if the Client already exists.  So if we use some randStr, it changes
+    #    on redeploy, and goes out of sync.
+    # ii) letting the operator generate a secret, and fish it out of the
+    #     keycloak-client-secret-${clientId} Secret.  Mounting said Secret
+    #     doesn't work cross-namespace (which is the desired way to deploy apps)
 {{- end -}}

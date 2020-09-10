@@ -32,6 +32,8 @@ for a quickstart.
   > `kubectl get secret -n auth credential-sso-my-keycloak -o go-template='{{ .data.ADMIN_PASSWORD | base64decode }}'`
 * don't see a way to supply themes (might need to customize the docker image)
 * only watches a single namespace -- deploy all `Keycloak*` CRDs into a designated one?
+* `Secret` objects with client secrets are created in the single namespace,
+  too -- can't mount them as volumes in the app namespace(s)
 * operator doesn't handle all cases, e.g. `KeycloakRealm` created after `KeycloakClient`
   (client is not created -- it is after restarting the operator though)
 * account/ page operations seem to say "An internal server error has occurred" on any changes
