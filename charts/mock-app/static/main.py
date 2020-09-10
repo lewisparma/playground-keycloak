@@ -45,6 +45,15 @@ HTML = """\
       <p class="lead">This is the {{ what }} page.</p>
       {% endif %}
     </div>
+
+    {% if no_original_uri %}
+    <div class="alert alert-danger">
+      Missing <code>X-Original-Uri</code> header; this will break generated URIs.
+      Make sure your nginx-ingress ConfigMap contains:
+      <pre>proxy-add-original-uri-header: "true"</pre>
+    </div>
+    {% endif %}
+
     
     {% if args.error %}
     <div class="alert alert-danger">
@@ -140,6 +149,7 @@ def render_page(**kw):
         what=None,
         links=[],
         debug_links=[],
+        no_original_uri=not flask.request.headers.get('X-Original-Uri'),
     )
     d.update(kw)
     return flask.render_template_string(HTML, **d)
