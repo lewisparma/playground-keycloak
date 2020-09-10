@@ -28,6 +28,8 @@ for a quickstart.
 * `Ingress` provided by operator has wrong hostname; workaround: provide our own
   [`Ingress`](charts/my-keycloak/templates/ingress.yaml); also needed to set a
   larger `nginx.ingress.kubernetes.io/proxy-buffer-size` on it
+* operator doesn't seem to support configuring the base URL (or base path), so it
+  has to be `/auth`
 * there doesn't seem to be a way to supply an initial keycloak-admin password;  use e.g.
   > `kubectl get secret -n auth credential-sso-my-keycloak -o go-template='{{ .data.ADMIN_PASSWORD | base64decode }}'`
 * don't see a way to supply themes (might need to customize the docker image)
