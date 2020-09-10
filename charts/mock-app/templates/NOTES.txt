@@ -1,1 +1,4 @@
 Mock app
+To try out the CLI workflow, run:
+
+	kubectl exec -it -n {{ .Release.Namespace }} svc/{{ include "webapp.fullname" . }} -- mock-cli-login
