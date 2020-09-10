@@ -30,6 +30,10 @@ spec:
         - name: web-data
           configMap:
             name: {{ include "webapp.fullname" . }}-web-data
+        - name: client-secret
+          secret:
+            secretName: keycloak-client-secret-{{- include "webapp.clientId" . }}
+            optional: true
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -58,6 +62,8 @@ spec:
           volumeMounts:
             - name: web-data
               mountPath: /app
+            - name: client-secret
+              mountPath: /run/secrets/mock-app/client
           ports:
             - name: http
               containerPort: 80
