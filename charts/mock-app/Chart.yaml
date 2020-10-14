@@ -1,5 +1,0 @@
-apiVersion: v1
-appVersion: "latest"
-description: mock app
-name: mock-app
-version: 0.1.0
