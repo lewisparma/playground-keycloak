@@ -14,10 +14,6 @@ Under `charts/`:
   service instance, as well as a single
   [`KeycloakRealm`](charts/my-keycloak/templates/basic_realm.yaml) -- we'd
   expect exactly one of these per appliance
-* [mock-app](charts/mock-app/) deploys a sample application, as well as a
-  [`KeycloakClient`](charts/mock-app/templates/keycloak-client.yaml) for
-  itself in The One `KeycloakRealm`; there can be several of these per
-  appliance
 
 There's also a main [helmfile.yaml](helmfile.yaml) to tie them all together.
 `helmfile sync` on a bare cluster (but with nginx-ingress and CNI installed)
